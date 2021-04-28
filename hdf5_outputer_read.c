@@ -154,7 +154,6 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	if ( ndim > 1 ){
             printf("This application does not support multi-dimensional metadata.\n");
         }
-	//H5Aget_info( aid, &aid_info );
         //printf("metadata size = %llu, or %llu * %llu\n", (long long unsigned) aid_info.data_size, (long long unsigned) esize, (long long unsigned) dims[0] );
 
 
@@ -162,7 +161,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	attribute_bufs[0][i] = (char*) malloc(esize * dims[0]);
         attribute_types[0][i] = tid;
 	attribute_sizes[0][i] = dims[0];
-        printf("read attribute with name %s, size = %llu, dim size = %llu\n", attribute_name, (long long unsigned) ainfo.data_size, (long long unsigned)esize * dims[0]);
+        printf("read attribute with name %s, size = %llu, dim size = %llu\n", attribute_name, (long long unsigned) ainfo.data_size, (long long unsigned)(esize * dims[0]));
 	//err = H5Aread(aid, tid, attribute_bufs[0][i] );
 	if (err < 0) {
 	    printf("error code = %lld\n", (long long int) err);
