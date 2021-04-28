@@ -132,6 +132,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
     int ndim;
     size_t esize;
     herr_t err;
+    H5A_info_t ainfo;
 
     attribute_bufs[0] = (char**) malloc(sizeof(char*) * n_attributes);
     attribute_sizes[0] = (hsize_t*) malloc(sizeof(hsize_t) * n_attributes);
@@ -156,11 +157,13 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	//H5Aget_info( aid, &aid_info );
         //printf("metadata size = %llu, or %llu * %llu\n", (long long unsigned) aid_info.data_size, (long long unsigned) esize, (long long unsigned) dims[0] );
 
+
+        H5Aget_info( aid, &ainfo );
 	attribute_bufs[0][i] = (char*) malloc(esize * dims[0]);
         attribute_types[0][i] = tid;
 	attribute_sizes[0][i] = dims[0];
-        printf("read attribute with name %s\n", attribute_name);
-	//err = H5Aread(aid, tid, attribute_bufs[0][i] );
+        printf("read attribute with name %s, size = %llu, dim size = %llu\n", attribute_name, (long long unsigned) ainfo.data_size, (long long unsigned)esize * dims[0]);
+	err = H5Aread(aid, tid, attribute_bufs[0][i] );
 	if (err < 0) {
 	    printf("error code = %lld\n", (long long int) err);
 	}
