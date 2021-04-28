@@ -34,6 +34,12 @@ double metadata_write_time;
 double open_time;
 double close_time;
 
+/*
+ * This function is going to scan through an HDF5 file.
+ * If gid is a group (could be the top directory"/"), this function is going to list all group and datasets.
+ * For datasets, we are going to read them and write to our new file.
+ * For groups, we are going to recurse into this function again.
+*/
 int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *dataset_list_size, size_t *dataset_list_max_size) {
     size_t i;
     ssize_t len;
@@ -75,7 +81,9 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
             }
             case H5G_DATASET: {
                 //printf(" DATASET: %s\n", memb_name);KE
+                /* Open a dataset from the current group */
                 did = H5Dopen(gid, memb_name, H5P_DEFAULT);
+                /* We write the dataset into our new file*/
 		if ( out_grpid >= 0 ) {
                     dsid = H5Dget_space (did);
                     tid = H5Dget_type(did);
@@ -172,6 +180,11 @@ int clear_dataset (hid_t *dataset_list, hsize_t dataset_list_size) {
     return 0;
 }
 
+/*
+ * This function read a dataset into memory.
+ * buf contains the actual data.
+ * buf_size contains the number of data points in the dataset.
+*/
 int fetch_data(hid_t did, char** buf, hsize_t *buf_size) {
     hid_t dsid, sid, tid;
     int ndim, i;
@@ -190,7 +203,7 @@ int fetch_data(hid_t did, char** buf, hsize_t *buf_size) {
         total_data_size *= dims[i];
     }
     *buf = (char*) malloc(esize * total_data_size);
-    *buf_size = esize * total_data_size;
+    *buf_size = total_data_size;
     dims[0] = total_data_size;
     mdims[0] = total_data_size;
     sid = H5Screate_simple (1, dims, mdims);
@@ -203,6 +216,10 @@ int fetch_data(hid_t did, char** buf, hsize_t *buf_size) {
 
     return 0;
 }
+
+/*
+ * Write data cache by H5D_rw_multi_t. We can either use multidataset or not.
+*/
 
 int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
     int i;
@@ -233,6 +250,9 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
     return 0;
 }
 
+/*
+ * Write a dataset. We cache the dataset information into the H5D_rw_multi_t structure. The flush_dataset function will take care of the actual write
+*/
 int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hid_t mtype, H5D_rw_multi_t *dataset, char** attribute_names, char** attribute_bufs, hsize_t *attribute_sizes, hid_t *attribute_types, int n_attributes) {
     hid_t sid, dsid, did, asid, aid;
     hsize_t i;
