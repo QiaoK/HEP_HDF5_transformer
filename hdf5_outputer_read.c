@@ -6,7 +6,7 @@
 #include <unistd.h>
 #define MAX_NAME 1024
 #define ENABLE_MULTIDATASET 0
-#define MULTIDATASET_DEFINE 1
+#define MULTIDATASET_DEFINE 0
 
 #if MULTIDATASET_DEFINE == 1
 typedef struct H5D_rw_multi_t
