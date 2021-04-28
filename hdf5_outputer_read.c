@@ -42,7 +42,6 @@ double close_time;
 */
 int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *dataset_list_size, size_t *dataset_list_max_size) {
     size_t i;
-    ssize_t len;
     hsize_t nobj, buf_size;
     int otype;
     hid_t grpid, out_grpid, dsid, did, tid;
@@ -57,7 +56,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     H5D_rw_multi_t *datasets;
     int dataset_index;
 
-    len = H5Iget_name(gid, group_name, MAX_NAME  );
+    H5Iget_name(gid, group_name, MAX_NAME  );
     H5Gget_num_objs(gid, &nobj);
     if (out_gid >= 0 && strcmp(group_name, "/") != 0) {
         out_grpid = H5Gcreate( out_gid, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -69,7 +68,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     datasets = (H5D_rw_multi_t*) malloc(sizeof(H5D_rw_multi_t) * nobj);
     dataset_index = 0;
     for (i = 0; i < nobj; i++) {
-        len = H5Gget_objname_by_idx(gid, (hsize_t)i, memb_name, (size_t)MAX_NAME );
+        H5Gget_objname_by_idx(gid, (hsize_t)i, memb_name, (size_t)MAX_NAME );
         otype =  H5Gget_objtype_by_idx(gid, (size_t)i );
         switch(otype) {
             case H5G_GROUP: {
@@ -225,11 +224,11 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
     int i;
     void *temp;
     struct timeval start_time, end_time;
-    hid_t dxplid = H5Pcreate (H5P_DATASET_XFER);
 
     gettimeofday(&start_time, NULL);
     printf("number of datasets to be written = %d\n", dataset_size);
 #if ENABLE_MULTIDATASET == 1
+    hid_t dxplid = H5Pcreate (H5P_DATASET_XFER);
     printf("Multidataset: number of datasets to be written = %d\n", dataset_size);
     H5Dwrite_multi(dxplid, dataset_size, datasets);
     H5Pclose(dxplid);
@@ -256,7 +255,7 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
 */
 int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hid_t mtype, H5D_rw_multi_t *dataset, char** attribute_names, char** attribute_bufs, hsize_t *attribute_sizes, hid_t *attribute_types, int n_attributes) {
     hid_t sid, dsid, did, asid, aid;
-    hsize_t i;
+    int i;
     struct timeval start_time, end_time;
 
     sid = H5Screate_simple (1, &buf_size, &buf_size);
@@ -306,11 +305,14 @@ int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hi
 
 int main (int argc, char **argv) {
     hid_t faplid, file, out_file, gid;
-    ssize_t total_objects;
     size_t dataset_list_size = 0, dataset_list_max_size = 0;
     hid_t *dataset_list;
-    char *buf;
     char out_filename[256];
+
+    if (argc != 1 ) { 
+        printf("Usage: ./test filename\n");
+        return 1;
+    }
 
     printf("opening file %s\n", argv[1]);
 
@@ -330,7 +332,6 @@ int main (int argc, char **argv) {
     scan_datasets(out_file, gid, &dataset_list, &dataset_list_size, &dataset_list_max_size);
 
     clear_dataset(dataset_list, dataset_list_size);
-    //H5Fget_obj_ids( file, H5F_OBJ_DATASET, total_objects, obj_id_list );
 
     printf("open time = %lf\n", open_time/1000000);
     printf("metadata write time = %lf\n", metadata_write_time/1000000);
