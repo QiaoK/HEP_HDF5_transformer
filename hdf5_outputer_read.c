@@ -309,7 +309,7 @@ int main (int argc, char **argv) {
     hid_t *dataset_list;
     char out_filename[256];
 
-    if (argc != 1 ) { 
+    if (argc != 2 ) { 
         printf("Usage: ./test filename\n");
         return 1;
     }
