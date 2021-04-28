@@ -251,7 +251,8 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
 }
 
 /*
- * Write a dataset. We cache the dataset information into the H5D_rw_multi_t structure. The flush_dataset function will take care of the actual write
+ * Write a dataset. We cache the dataset information into the H5D_rw_multi_t structure. The flush_dataset function will take care of the actual write.
+ * If there are any HDF5 attributes, we will take care of the write here.
 */
 int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hid_t mtype, H5D_rw_multi_t *dataset, char** attribute_names, char** attribute_bufs, hsize_t *attribute_sizes, hid_t *attribute_types, int n_attributes) {
     hid_t sid, dsid, did, asid, aid;
