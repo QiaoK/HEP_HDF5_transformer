@@ -49,7 +49,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     char memb_name[MAX_NAME];
     hid_t *temp;
     char *buf;
-    char **attribute_names, **attribute_bufs;
+    char **attribute_names = NULL, **attribute_bufs = NULL;
     hsize_t *attribute_sizes;
     hid_t *attribute_types;
     int n_attributes;
