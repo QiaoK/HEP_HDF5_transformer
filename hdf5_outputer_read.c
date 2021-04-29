@@ -328,11 +328,6 @@ int main (int argc, char **argv) {
     char out_filename[256];
     int use_core_driver;
 
-    char **attribute_names = NULL, **attribute_bufs = NULL;
-    hsize_t *attribute_sizes = NULL;
-    hid_t *attribute_types = NULL;
-    int n_attributes = 0;
-
     if (argc != 3 ) { 
         printf("Usage: ./test filename core_driver\n");
         return 1;
@@ -348,9 +343,6 @@ int main (int argc, char **argv) {
 
     faplid = H5Pcreate (H5P_FILE_ACCESS);
     file = H5Fopen (argv[1], H5F_ACC_RDONLY, faplid);
-
-    scan_attributes(file, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
-    printf("number of attributes is %d\n", n_attributes);
 
     sprintf(out_filename, "%s.copy", argv[1]);
 
