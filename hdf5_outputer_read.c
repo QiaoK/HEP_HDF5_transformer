@@ -75,8 +75,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
                 //printf(" GROUP: %s\n", memb_name);
                 grpid = H5Gopen(gid, memb_name, H5P_DEFAULT);
                 scan_datasets(out_grpid, grpid, dataset_list, dataset_list_size, dataset_list_max_size);
-		    //scan_attributes(grpid, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
-
+		scan_attributes(grpid, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
                 H5Gclose(grpid);
                 break;
             }
