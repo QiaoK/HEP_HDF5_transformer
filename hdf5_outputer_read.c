@@ -52,7 +52,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     char **attribute_names = NULL, **attribute_bufs = NULL;
     hsize_t *attribute_sizes = NULL;
     hid_t *attribute_types = NULL;
-    int n_attributes;
+    int n_attributes = 0;
     H5D_rw_multi_t *datasets = NULL;
     int dataset_index;
 
