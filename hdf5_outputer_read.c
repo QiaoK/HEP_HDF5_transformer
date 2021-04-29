@@ -326,12 +326,14 @@ int main (int argc, char **argv) {
     size_t dataset_list_size = 0, dataset_list_max_size = 0;
     hid_t *dataset_list;
     char out_filename[256];
+    int use_core_driver;
 
-    if (argc != 2 ) { 
-        printf("Usage: ./test filename\n");
+    if (argc != 3 ) { 
+        printf("Usage: ./test filename core_driver\n");
         return 1;
     }
 
+    use_core_driver = atoi(argv[2]);
     printf("opening file %s\n", argv[1]);
 
     dataset_write_time = 0;
@@ -343,7 +345,9 @@ int main (int argc, char **argv) {
     file = H5Fopen (argv[1], H5F_ACC_RDONLY, faplid);
     sprintf(out_filename, "%s.copy", argv[1]);
 
-    //H5Pset_fapl_core( faplid, 10510925824, 1 );
+    if ( use_core_driver ) { 
+        H5Pset_fapl_core( faplid, 10510925824, 1 );
+    }
     out_file = H5Fcreate (out_filename, H5F_ACC_TRUNC, H5P_DEFAULT, faplid);
 
     gid = H5Gopen(file, "/", H5P_DEFAULT);
