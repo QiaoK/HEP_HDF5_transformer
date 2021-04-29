@@ -279,15 +279,15 @@ int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hi
 
     gettimeofday(&start_time, NULL);
     for ( i = 0; i < n_attributes; ++i ) {
-        //asid  = H5Screate_simple (1, attribute_sizes + i, attribute_sizes + i);
-        //aid = H5Acreate2( did, attribute_names[i], attribute_types[i], asid, H5P_DEFAULT, H5P_DEFAULT);
-        //H5Awrite(aid, attribute_types[i], attribute_bufs[i] );
+        asid  = H5Screate_simple (1, attribute_sizes + i, attribute_sizes + i);
+        aid = H5Acreate2( did, attribute_names[i], attribute_types[i], asid, H5P_DEFAULT, H5P_DEFAULT);
+        H5Awrite(aid, attribute_types[i], attribute_bufs[i] );
         //printf("dataset to be written has size %llu, name = %s, aid = %lld\n", (long long unsigned) attribute_sizes[i], attribute_names[i], (long long int) aid);
 	free(attribute_names[i]);
 	free(attribute_bufs[i]);
 	H5Tclose( attribute_types[i]);
-	//H5Sclose(asid);
-	//H5Aclose(aid);
+	H5Sclose(asid);
+	H5Aclose(aid);
     }
     gettimeofday(&end_time, NULL);
     metadata_write_time += (end_time.tv_usec + end_time.tv_sec * 1000000 - start_time.tv_usec - start_time.tv_sec * 1000000) * 1.0;
