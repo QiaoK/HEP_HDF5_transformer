@@ -352,12 +352,6 @@ int main (int argc, char **argv) {
     scan_attributes(file, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
     printf("number of attributes is %d\n", n_attributes);
 
-    char **attribute_names = NULL, **attribute_bufs = NULL;
-    hsize_t *attribute_sizes = NULL;
-    hid_t *attribute_types = NULL;
-    int n_attributes = 0;
-
-
     sprintf(out_filename, "%s.copy", argv[1]);
 
     if ( use_core_driver ) { 
