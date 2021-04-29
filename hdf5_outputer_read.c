@@ -75,8 +75,6 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
                 //printf(" GROUP: %s\n", memb_name);
                 grpid = H5Gopen(gid, memb_name, H5P_DEFAULT);
                 scan_datasets(out_grpid, grpid, dataset_list, dataset_list_size, dataset_list_max_size);
-		scan_attributes(grpid, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
-                n_attributes = 0;
                 H5Gclose(grpid);
                 break;
             }
@@ -84,12 +82,12 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
                 //printf(" DATASET: %s\n", memb_name);KE
                 /* Open a dataset from the current group */
                 did = H5Dopen(gid, memb_name, H5P_DEFAULT);
-		    //scan_attributes(did, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
                 /* We write the dataset into our new file*/
 		if ( out_grpid >= 0 ) {
                     dsid = H5Dget_space (did);
                     tid = H5Dget_type(did);
                     fetch_data(did, &buf, &buf_size);
+                    scan_attributes(did, &attribute_names, &attribute_bufs, &attribute_sizes, &attribute_types, &n_attributes);
 		    write_data(buf, buf_size, memb_name, out_grpid, tid, datasets + dataset_index, attribute_names, attribute_bufs, attribute_sizes, attribute_types, n_attributes);
                     dataset_index++;
                     H5Sclose(dsid);
