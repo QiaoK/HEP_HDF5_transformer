@@ -150,7 +150,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	esize = H5Tget_size (tid);
 
 	if ( ndim != 1 ){
-            printf("This application does not support multi-dimensional metadata.\n");
+            //printf("This application does not support multi-dimensional metadata.\n");
             H5Tclose(tid);
             H5Sclose(asid);
             H5Aclose(aid);
@@ -259,8 +259,8 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
  * If there are any HDF5 attributes, we will take care of the write here.
 */
 int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hid_t mtype, H5D_rw_multi_t *dataset, char** attribute_names, char** attribute_bufs, hsize_t *attribute_sizes, hid_t *attribute_types, int n_attributes) {
-    hid_t sid, dsid, did, asid, aid;
-    int i;
+    hid_t sid, dsid, did/*, asid, aid*/;
+    //int i;
     struct timeval start_time, end_time;
 
     sid = H5Screate_simple (1, &buf_size, &buf_size);
