@@ -47,13 +47,13 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     hid_t grpid, out_grpid, dsid, did, tid;
     char group_name[MAX_NAME];
     char memb_name[MAX_NAME];
-    hid_t *temp;
-    char *buf;
+    hid_t *temp = NULL;
+    char *buf = NULL;
     char **attribute_names = NULL, **attribute_bufs = NULL;
-    hsize_t *attribute_sizes;
-    hid_t *attribute_types;
+    hsize_t *attribute_sizes = NULL;
+    hid_t *attribute_types = NULL;
     int n_attributes;
-    H5D_rw_multi_t *datasets;
+    H5D_rw_multi_t *datasets = NULL;
     int dataset_index;
 
     H5Iget_name(gid, group_name, MAX_NAME  );
