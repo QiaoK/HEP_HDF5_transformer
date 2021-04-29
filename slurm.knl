@@ -1,0 +1,32 @@
+#!/bin/bash -l
+#SBATCH -A m2621
+#SBATCH -p debug
+#SBATCH -N 1
+#SBATCH -t 00:05:00
+#SBATCH -o qout.%j
+#SBATCH -e qout.%j
+#SBATCH -L SCRATCH
+#SBATCH -C knl,quad,cache
+
+cd $SLURM_SUBMIT_DIR
+
+#module load darshan
+export DARSHAN_DISABLE_SHARED_REDUCTION=1
+export DXT_ENABLE_IO_TRACE=4
+
+export OUTDIR=$SCRATCH/FS_1M_64
+cp test $OUTDIR
+
+cd $OUTDIR
+
+#export H5_DIR="/global/homes/q/qkt561/mpich_develop/hdf5_multi/install"
+#export H5_DIR="/global/homes/q/qkt561/mpich_develop/hdf5-hdf5-1_12_0/install"
+export H5_DIR="/opt/cray/pe/hdf5-parallel/1.12.0.0/INTEL/19.1"
+#export LD_LIBRARY_PATH="$H5_DIR/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$ROMIO_DIR/lib:$H5_DIR/lib:$LD_LIBRARY_PATH"
+
+echo "./test $OUTDIR/hdf5_outtest.h5"
+#export LD_PRELOAD="/global/common/cori_cle7/software/darshan/3.2.1/lib/libdarshan.so"
+./test $OUTDIR/hdf5_outtest.h5 1
+#export LD_PRELOAD=""
+
