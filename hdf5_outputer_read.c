@@ -67,6 +67,9 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     }
     datasets = (H5D_rw_multi_t*) malloc(sizeof(H5D_rw_multi_t) * nobj);
     dataset_index = 0;
+
+    /* For groups, we are going to enter this function again.
+     * For datasets, we will read data and metadata. Then we will append data to dataset list.*/
     for (i = 0; i < nobj; i++) {
         H5Gget_objname_by_idx(gid, (hsize_t)i, memb_name, (size_t)MAX_NAME );
         otype =  H5Gget_objtype_by_idx(gid, (size_t)i );
@@ -82,7 +85,7 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
                 //printf(" DATASET: %s\n", memb_name);KE
                 /* Open a dataset from the current group */
                 did = H5Dopen(gid, memb_name, H5P_DEFAULT);
-                /* We write the dataset into our new file*/
+                /* Write only when out_grpid is created or the root directory "/". */
 		if ( out_grpid >= 0 ) {
                     dsid = H5Dget_space (did);
                     tid = H5Dget_type(did);
@@ -122,6 +125,9 @@ int scan_datasets(hid_t out_gid, hid_t gid, hid_t **dataset_list, size_t *datase
     return 0;
 }
 
+/*
+ * For hid, we extract all metadata associated with it.
+*/
 int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, hsize_t** attribute_sizes, hid_t **attribute_types, int* n_attributes_ptr) {
     hid_t aid, tid, asid;
     char attribute_name[1024];
@@ -162,10 +168,10 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	strcpy(attribute_names[0][i], attribute_name);
 
         H5Aget_info( aid, &ainfo );
-	attribute_bufs[0][i] = (char*) malloc(ainfo.data_size * esize);
+	attribute_bufs[0][i] = (char*) malloc(dims[0] * esize);
         attribute_types[0][i] = tid;
-	attribute_sizes[0][i] = ainfo.data_size;
-        printf("read attribute with name %s, size = %llu, esize = %llu, ndim = %d, dim size = %llu\n", attribute_name, (long long unsigned) ainfo.data_size, (long long unsigned)esize, ndim, (long long unsigned)dims[0] );
+	attribute_sizes[0][i] = dims[0];
+        //printf("read attribute with name %s, size = %llu, esize = %llu, ndim = %d, dim size = %llu\n", attribute_name, (long long unsigned) ainfo.data_size, (long long unsigned)esize, ndim, (long long unsigned)dims[0] );
 	err = H5Aread(aid, tid, attribute_bufs[0][i] );
 	if (err < 0) {
 	    printf("error code = %lld\n", (long long int) err);
@@ -175,6 +181,10 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
     }
     return 0;
 }
+
+/*
+ * A quick function to close datasets.
+*/
 
 int clear_dataset (hid_t *dataset_list, hsize_t dataset_list_size) {
     size_t i;
@@ -259,8 +269,8 @@ int flush_dataset(H5D_rw_multi_t *datasets, int dataset_size) {
  * If there are any HDF5 attributes, we will take care of the write here.
 */
 int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hid_t mtype, H5D_rw_multi_t *dataset, char** attribute_names, char** attribute_bufs, hsize_t *attribute_sizes, hid_t *attribute_types, int n_attributes) {
-    hid_t sid, dsid, did/*, asid, aid*/;
-    //int i;
+    hid_t sid, dsid, did, asid, aid;
+    int i;
     struct timeval start_time, end_time;
 
     sid = H5Screate_simple (1, &buf_size, &buf_size);
@@ -281,7 +291,7 @@ int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hi
     //dataset_write_time += (end_time.tv_usec + end_time.tv_sec * 1000000 - start_time.tv_usec - start_time.tv_sec * 1000000) * 1.0;
 
     gettimeofday(&start_time, NULL);
-/*
+
     for ( i = 0; i < n_attributes; ++i ) {
         asid  = H5Screate_simple (1, attribute_sizes + i, attribute_sizes + i);
         aid = H5Acreate2( did, attribute_names[i], attribute_types[i], asid, H5P_DEFAULT, H5P_DEFAULT);
@@ -293,7 +303,7 @@ int write_data(char *buf, hsize_t buf_size, char *dataset_name, hid_t out_id, hi
 	H5Sclose(asid);
 	H5Aclose(aid);
     }
-*/
+
     gettimeofday(&end_time, NULL);
     metadata_write_time += (end_time.tv_usec + end_time.tv_sec * 1000000 - start_time.tv_usec - start_time.tv_sec * 1000000) * 1.0;
     if ( n_attributes ) {
