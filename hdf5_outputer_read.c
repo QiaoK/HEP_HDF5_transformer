@@ -160,6 +160,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
             H5Tclose(tid);
             H5Sclose(asid);
             H5Aclose(aid);
+            n_attributes--;
             continue;
         }
         //printf("metadata size = %llu, or %llu * %llu\n", (long long unsigned) aid_info.data_size, (long long unsigned) esize, (long long unsigned) dims[0] );
