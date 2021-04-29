@@ -132,7 +132,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
     hid_t aid, tid, asid;
     char attribute_name[1024];
     //H5A_info_t aid_info;
-    int n_attributes = H5Aget_num_attrs(hid);
+    int n_attributes = H5Aget_num_attrs(hid), valid_attributes = 0;
     int i;
     hsize_t dims[H5S_MAX_RANK], mdims[H5S_MAX_RANK];
     int ndim;
@@ -144,7 +144,6 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
     attribute_sizes[0] = (hsize_t*) malloc(sizeof(hsize_t) * n_attributes);
     attribute_names[0] = (char**) malloc(sizeof(char*) * n_attributes);
     attribute_types[0] = (hid_t*) malloc(sizeof(hid_t) * n_attributes);
-    *n_attributes_ptr = n_attributes;
 
     for ( i = 0; i < n_attributes; ++i ) {
         aid = H5Aopen_by_idx( hid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, (hsize_t) i, H5P_DEFAULT, H5P_DEFAULT );
@@ -160,11 +159,11 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
             H5Tclose(tid);
             H5Sclose(asid);
             H5Aclose(aid);
-            n_attributes--;
             continue;
         }
         //printf("metadata size = %llu, or %llu * %llu\n", (long long unsigned) aid_info.data_size, (long long unsigned) esize, (long long unsigned) dims[0] );
 
+        valid_attributes += 1;
 	attribute_names[0][i] = (char*) malloc(sizeof(char) * (strlen(attribute_name)+1));
 	strcpy(attribute_names[0][i], attribute_name);
 
@@ -180,6 +179,7 @@ int scan_attributes(hid_t hid, char*** attribute_names, char*** attribute_bufs, 
 	H5Sclose(asid);
         H5Aclose(aid);
     }
+    *n_attributes_ptr = valid_attributes;
     return 0;
 }
 
